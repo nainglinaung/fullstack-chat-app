@@ -8,8 +8,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// var user = map[string]string{}
-
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	var creds Credentials
 
@@ -22,7 +20,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := &User{UserName: creds.Username, Password: creds.Password}
+	user := &User{Username: creds.Username, Password: creds.Password}
 
 	if err := DB.Create(&user).Error; err != nil {
 		http.Error(w, "User already exists or erro occur", http.StatusConflict)
@@ -63,9 +61,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
-		Value:   tokenString,
-		Expires: expirationTime,
-	})
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
+
 }
