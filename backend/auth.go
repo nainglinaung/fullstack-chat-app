@@ -1,6 +1,7 @@
 package main
 
 import (
+	chatdb "chatapp/db" // Add this import
 	"encoding/json"
 	"net/http"
 	"time"
@@ -20,9 +21,9 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := &User{Username: creds.Username, Password: creds.Password}
+	user := &chatdb.User{Username: creds.Username, Password: creds.Password}
 
-	if err := DB.Create(&user).Error; err != nil {
+	if err := db.CreateUser(user); err != nil {
 		http.Error(w, "User already exists or erro occur", http.StatusConflict)
 		return
 	}
@@ -38,11 +39,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var user User
+	result, err := db.GetUserByUsername(creds.Username)
 
-	result := DB.Where("username = ?", creds.Username).First(&user)
-
-	if result.Error != nil || user.Password != creds.Password {
+	if err != nil || result.Password != creds.Password {
 		http.Error(w, "Invalid Credentials", http.StatusUnauthorized)
 	}
 

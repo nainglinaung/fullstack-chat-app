@@ -1,22 +1,19 @@
-package main
+package db
 
 import (
-	"log"
-
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
 
-func initDB() {
+func InitDB() (*GormDB, error) {
 	var err error
 
 	DB, err = gorm.Open(sqlite.Open("chat.db"), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Failed to migrate database:", err)
+		return nil, err
 	}
 
-	DB.AutoMigrate(&User{})
-
+	return &GormDB{DB: DB}, nil
 }

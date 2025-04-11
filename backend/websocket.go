@@ -72,6 +72,7 @@ func handleMessage() {
 		msg := <-broadcast
 		lock.Lock()
 		for conn := range clients {
+			fmt.Println(msg)
 			err := conn.WriteJSON(msg)
 			if err != nil {
 				conn.Close()

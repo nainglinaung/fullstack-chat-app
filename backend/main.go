@@ -1,6 +1,7 @@
 package main
 
 import (
+	chatdb "chatapp/db"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,15 +11,21 @@ import (
 )
 
 var jwtKey []byte
+var db chatdb.DBLayer
 
 func main() {
 	err := godotenv.Load()
 
-	initDB()
-
 	if err != nil {
 		log.Fatal("Error Loading .env file")
 	}
+
+	gorm, err := chatdb.InitDB()
+	if err != nil {
+		log.Fatal("DB init failed:", err)
+	}
+
+	db = gorm
 	jwtKey = []byte(os.Getenv("JWT_SECRET"))
 
 	port := os.Getenv("PORT")
